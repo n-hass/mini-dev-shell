@@ -25,8 +25,7 @@
               in {
                 "" = "";
                 "0" = "";
-                "1" = execUserShell;
-                "auto" = ''
+                "1" = ''
                   if [ "$DIRENV_IN_ENVRC" = "1" ]; then
                     # do nothing, direnv will load a new shell
                     :
@@ -36,6 +35,7 @@
                     echo "Unknown environment loader - use direnv or 'nix develop'"
                   fi
                 '';
+                "force" = execUserShell;
               }.${toString shellHookOption};
 
 
