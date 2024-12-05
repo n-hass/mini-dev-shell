@@ -2,16 +2,16 @@
   description = "A flake for building dev shells";
 
   inputs = {
-    mkminimalshell.url = "github:n-hass/mkminimalshell";
+    mk-minimal-shell.url = "github:n-hass/mkminimalshell";
   };
 
   outputs =
-    { self, mkminimalshell }:
+    { self, mk-minimal-shell }:
     {
       overlay =
         final: prev:
         let
-          baseMkMinimalShell = mkminimalshell.overlay final prev;
+          baseMkMinimalShell = mk-minimal-shell.overlay final prev;
         in
         {
           mkMiniDevShell = args:
