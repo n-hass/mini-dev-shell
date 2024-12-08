@@ -17,4 +17,4 @@ mini-dev-shell.mkMiniDevShell (system: pkgs: {
 this will generate a devShell for each system.
 
 Specify `extraFlakeOutputs` to add extra things to the flake output, like apps. 
-Note that the 'raw' attributes you provide are added to the final flake, so you must handle specifying for each system yourself.
+Note that the attributes you provide are recursiveUpdated inside a `flake-utils.lib.eachDefaultSystem` with the automatically generated `devShell.default` output.
