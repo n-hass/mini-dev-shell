@@ -2,9 +2,9 @@
   description = "A flake for building development shells";
 
   inputs = {
-    flake-utils.url = "github:numtide/flake-utils";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    mk-minimal-shell.url = "github:n-hass/mkminimalshell";
+    nixpkgs.url           = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    flake-utils.url        = "github:numtide/flake-utils";
+    mk-minimal-shell.url  = "github:n-hass/mkminimalshell";
   };
 
   outputs =
@@ -21,11 +21,11 @@
           overlays = [ (mk-minimal-shell.overlay) ];
         };
         uncheckedArgs = argThunk system requiredPkgs;
-        extraFlakeAttrs = uncheckedArgs.extraFlakeAttrs or {};
+        extraFlakeOutputs = uncheckedArgs.extraFlakeOutputs or {};
         args = { pkgs = requiredPkgs; } // uncheckedArgs;
         pkgs = args.pkgs;
         lib = pkgs.lib;
-        shellArgs = args // { extraFlakeAttrs = null; pkgs = null; };
+        shellArgs = args // { extraFlakeOutputs = null; pkgs = null; };
       in ({
         devShells =
           let
@@ -72,7 +72,7 @@
               in 
                 result;
             };
-          } // extraFlakeAttrs
+          } // extraFlakeOutputs
         )
       ));
       pkgs = nixpkgs;
