@@ -10,6 +10,9 @@
       myLib = import ./lib.nix { };
     in
     {
-      mkMiniDevShell = args: (myLib.mkCustomShell mkShell args pkgs);
+      mkMiniDevShell = args: let 
+        pkgsActual = if (args ? pkgs) then args.pkgs else pkgs;
+        argsClean = args // { pkgs = null; };
+      in (myLib.mkCustomShell mkShell argsClean pkgsActual);
     };
 }
