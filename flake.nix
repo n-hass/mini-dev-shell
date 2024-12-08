@@ -15,15 +15,20 @@
       mk-minimal-shell,
     }:
     {
-      mkMiniDevShell = args: (flake-utils.lib.eachDefaultSystem (system: {
+      mkMiniDevShell = argThunk: (flake-utils.lib.eachDefaultSystem (system: let
+        requiredPkgs = import nixpkgs {
+          inherit system;
+          overlays = [ (mk-minimal-shell.overlay) ];
+        };
+        uncheckedArgs = argThunk system requiredPkgs;
+        extraFlakeAttrs = uncheckedArgs.extraFlakeAttrs or {};
+        args = { pkgs = requiredPkgs; } // uncheckedArgs;
+        pkgs = args.pkgs;
+        lib = pkgs.lib;
+        shellArgs = args // { extraFlakeAttrs = null; pkgs = null; };
+      in ({
         devShells =
           let
-            pkgs = import nixpkgs {
-              inherit system;
-              overlays = [ mk-minimal-shell.overlay ];
-            };
-            lib = pkgs.lib;
-
             shellHookOption = args.returnToUserShell or false;
             returnToUserShellHook = let 
               execUserShell = ''
@@ -59,9 +64,17 @@
             };
           in
             {
-            default = pkgs.mkMinimalShell (lib.recursiveUpdate args generatedArgs);
+              default = let 
+                result = lib.warnIf 
+                  (!(pkgs ? mkMinimalShell)) 
+                  "mkMinimalShell is missing! If you've overriden pkgs, ensure that it's provided as pkgs.mkMinimalShell."
+                  pkgs.mkMinimalShell (lib.recursiveUpdate shellArgs generatedArgs);
+              in 
+                result;
             };
-          }));
+          } // extraFlakeAttrs
+        )
+      ));
       pkgs = nixpkgs;
       lib = nixpkgs.lib;
     };
