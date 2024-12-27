@@ -23,13 +23,13 @@
         "lastModified": 1733373576,
         "narHash": "sha256-mHQFMP0KUxmbmzhHIpXNFFH4aghme1spf+lX3dNf2CQ=",
         "owner": "n-hass",
-        "repo": "mkminimalshell",
+        "repo": "mk-minimal-shell",
         "rev": "a79cd6b7e2dc701eaf85ba104b57de9f365f953a",
         "type": "github"
       },
       "original": {
         "owner": "n-hass",
-        "repo": "mkminimalshell",
+        "repo": "mk-minimal-shell",
         "type": "github"
       }
     },

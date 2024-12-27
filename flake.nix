@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    mk-minimal-shell.url = "github:n-hass/mkminimalshell";
+    mk-minimal-shell.url = "github:n-hass/mk-minimal-shell";
   };
 
   outputs =
