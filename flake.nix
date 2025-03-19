@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
     mk-minimal-shell.url = "github:n-hass/mk-minimal-shell";
   };
 
@@ -11,13 +10,14 @@
     {
       self,
       nixpkgs,
-      flake-utils,
       mk-minimal-shell,
     }:
-    {
+    let
+      myLib = import ./lib.nix { };
+    in {
       mkMiniDevShell =
         argThunk:
-        (flake-utils.lib.eachDefaultSystem (
+        (myLib.forAllSystems (
           system:
           let
             requiredPkgs = import nixpkgs {
@@ -33,7 +33,6 @@
               pkgs = requiredPkgs;
             } // uncheckedArgs;
             pkgs = args.pkgs;
-            myLib = import ./lib.nix { };
             lib = pkgs.lib;
             shellArgs = args // {
               extraFlakeOutputs = null;
@@ -57,7 +56,7 @@
               };
           } extraFlakeOutputs)
         ));
-      lib = import ./lib.nix { };
+      lib = myLib;
       overlay = (import ./overlay.nix { inherit mk-minimal-shell; }).overlay;
     };
 }
