@@ -62,6 +62,7 @@ in {
     mkShell: args: pkgs:
     let
       lib = pkgs.lib;
+      servicesLib = import ./services.nix { inherit pkgs lib; };
       shellHookOption = args.returnToUserShell or false;
       returnToUserShellHook =
         let
@@ -88,10 +89,11 @@ in {
         .${toString shellHookOption};
 
       generatedArgs = {
+        services = null;
+        buildInputs = servicesLib.mkProcessComposeWrappers args; 
         extraUnsetEnv = [
           "returnToUserShell"
         ];
-
         shellHook = ''
           ${args.shellHook or ""}
           ${returnToUserShellHook}
