@@ -90,7 +90,7 @@ in {
 
       generatedArgs = {
         services = null;
-        buildInputs = servicesLib.mkProcessComposeWrappers args; 
+        buildInputs = servicesLib.mkProcessComposeWrappers args ++ (args.buildInputs or []); 
         extraUnsetEnv = [
           "returnToUserShell"
         ];
