@@ -18,6 +18,7 @@
     let
       myLib = import ./lib.nix { };
       overlay = (import ./overlay.nix { inherit mk-minimal-shell; }).overlay;
+      types = import ./types.nix { lib = nixpkgs.lib; };
     in
     {
       mkMiniDevShell =
@@ -75,39 +76,41 @@
           options.perSystem = flake-parts-lib.mkPerSystemOption (
             { config, system, ... }:
             {
-              options.miniShell = lib.mkOption {
-                type = lib.types.attrs;
-                default = { };
-                description = ''
-                  An attribute set of shell arguments passed to mkCustomShell.
-                  This is equivalent to the arguments you would pass to mkMiniDevShell.
-                '';
+              options = {
+                miniShell = types.miniShellType;
+                miniShellOpts = types.miniShellOptsType;
               };
               config =
                 let
                   shellArgs = config.miniShell;
-                  extraPkgs = import nixpkgs {
+                  cfg = config.miniShellOpts;
+                  finalPkgs = if cfg.pkgs != null then cfg.pkgs else import nixpkgs {
                     inherit system;
                     overlays = [
-                      mk-minimal-shell.overlay
                       overlay
+                      mk-minimal-shell.overlay
                     ];
                   };
-                  baseShell = myLib.mkCustomShell extraPkgs.mkMinimalShell shellArgs extraPkgs;
-                  warningShell =
-                    lib.warnIf (!(extraPkgs ? mkMinimalShell))
+                  warningMkShell = userConfigArgs:
+                    lib.warnIf (!(finalPkgs ? mkMinimalShell))
                       "mkMinimalShell is missing! If you've overridden pkgs, ensure that it's provided as pkgs.mkMinimalShell."
-                      baseShell;
+                      (myLib.mkCustomShell finalPkgs.mkMinimalShell userConfigArgs finalPkgs);
                 in
                 {
-                  _module.args.pkgs = extraPkgs;
-                  devShells.default = warningShell;
+                  devShells.default = warningMkShell shellArgs;
+                  miniShellOpts.mkShell = warningMkShell;
+                  miniShellOpts.processCompose._package = if cfg.processCompose.overridePackage != null
+                    then cfg.processCompose.overridePackage
+                    else builtins.head ((import ./services.nix { pkgs = finalPkgs; inherit lib; }).mkProcessComposeWrappers shellArgs);
                 };
             }
           );
         };
 
       lib = myLib;
-      overlay = overlay;
+      overlays = {
+        default = overlay;
+        mk-minimal-shell = mk-minimal-shell.overlay;
+      };
     };
 }
