@@ -7,7 +7,6 @@ let
     "x86_64-linux"
     # Tier 2
     "aarch64-linux"
-    "x86_64-darwin"
     # Tier 3
     "armv6l-linux"
     "armv7l-linux"
